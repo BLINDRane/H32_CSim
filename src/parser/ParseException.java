@@ -8,6 +8,8 @@ package parser;
  *
  * @author Alan
  */
+
+//Create a new type of exception for use with the parser
 public class ParseException extends Exception {
 
     public ParseException(Throwable cause) {
