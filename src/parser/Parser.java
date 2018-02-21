@@ -42,13 +42,14 @@ import ptn.WhileState;
  */
 public class Parser {
 
+    //Create a new parser
     public Parser(Lexer lex) {
         this.lex = lex;
         this.stab = SymbolTable.getInstance();
         errorMessages = new ArrayList<>();
         errors = false;
     }
-
+    
     public SymbolTable getSymbolTable() {
         return stab;
     }
@@ -71,12 +72,14 @@ public class Parser {
         }
     }
 
+    //Checks to see if the file passed to the parser follows the expected format for new programs
     private Program parseProgram() throws ParseException {
         Token s = (Token) lex.peek();
         Program n = new Program();
         if (s==null){
             throwParseException("Empty program.",new Token("ERROR",SType.KW,0,0));
         }
+        //If the program doesn't start with "main" start parsing functions
         if (!s.getSymbol().equals("main")) {
             n.setFuncts(parseFuncts());
         }
@@ -99,6 +102,7 @@ public class Parser {
         return n;
     }
 
+    //Go through the program looking for functions (methods)
     private Functs parseFuncts() throws ParseException {
         Functs n = new Functs();
         Token s = lex.peek();
@@ -115,7 +119,7 @@ public class Parser {
         }
         return n;
     }
-
+    //Read over a found function and check each piece for validity
     private Funct parseFunct() throws ParseException {
         Token s;
         Funct n = new Funct();
@@ -146,7 +150,7 @@ public class Parser {
         stab.popScope();
         return n;
     }
-
+    //Find the symbol type of the token the parser is currently looking at
     private Type parseType() throws ParseException {
         Token s = lex.next();
         if (s.getSType() != SType.TY) {
@@ -162,7 +166,7 @@ public class Parser {
         }
         return t;
     }
-
+    //Look for the open close parentheses that signals a set of function parameters
     private ParamList parseParamList() throws ParseException {
         ParamList n = new ParamList();
         Token s = lex.peek();
@@ -176,7 +180,7 @@ public class Parser {
         }
         return n;
     }
-
+    //Check over each parameter and return them as n
     private Param parseParam() throws ParseException {
         Param n = new Param();
         n.setType(parseType());
@@ -185,7 +189,7 @@ public class Parser {
         //n.setScope(stab.getCurrentScope());
         return n;
     }
-
+    //Looks for blocks and iterates through them
     private Block parseBlock() throws ParseException {
         Token s = lex.next();
         Block n = new Block();
@@ -202,7 +206,7 @@ public class Parser {
         }
         return n;
     }
-
+    
     private DeclStats parseDeclStats() throws ParseException {
         DeclStats n = new DeclStats();
         Token s = lex.peek();
@@ -232,7 +236,7 @@ public class Parser {
         }
         return n;
     }
-
+    //Checks declared values
     private Decl parseDecl() throws ParseException {
         VarDecl n = new VarDecl();
         Token s = lex.peek();
@@ -260,7 +264,7 @@ public class Parser {
         stab.add(n.getName(), n.getType());
         return n;
     }
-
+    //Checks for array declaration
     public Decl parseArrayDecl(VarDecl v) throws ParseException {
         ArrayDecl n = new ArrayDecl(v);
         Token s = lex.next();
@@ -297,7 +301,7 @@ public class Parser {
         stab.add(n.getName(), n.getType());
         return n;
     }
-
+    //Checks for a valid statement
     private Statement parseStatement() throws ParseException {
         Token s = lex.peek();
         if (s.getSymbol().equals("{")) {
@@ -306,7 +310,7 @@ public class Parser {
             return parseSimpleState();
         }
     }
-
+    //Reads a valid statement and gets its parts
     private Statement parseSimpleState() throws ParseException {
         Token s = lex.peek();
         if (s.getSymbol().equals("for")) {
@@ -346,7 +350,7 @@ public class Parser {
             return null;
         }
     }
-
+    //Read a for loop and get its parts
     private ForState parseForState() throws ParseException {
         Token s = lex.next();
         if (!s.getSymbol().equals("for")) {
@@ -375,7 +379,7 @@ public class Parser {
         n.setBody(parseBlock());
         return n;
     }
-
+    //Read an if block and get its parts
     private IfState parseIfState() throws ParseException {
         Token s = lex.next();
         if (!s.getSymbol().equals("if")) {
@@ -399,7 +403,7 @@ public class Parser {
         }
         return n;
     }
-
+    //Read a while block and get its parts
     private WhileState parseWhileState() throws ParseException {
         Token s = lex.next();
         if (!s.getSymbol().equals("while")) {
@@ -418,7 +422,7 @@ public class Parser {
         n.setBody(parseBlock());
         return n;
     }
-
+    //If a return statement is necessary, look for a return statement.
     private RetState parseReturnState() throws ParseException {
         Token s = lex.next();
         if (!s.getSymbol().equals("return")) {
@@ -435,7 +439,7 @@ public class Parser {
         }
         return n;
     }
-
+    //Look for increment or decrement symbols
     private Statement parseIncDecState() throws ParseException {
         Token s = lex.peek();
         if (!s.getSymbol().equals("++") && !s.getSymbol().equals("--")) {
@@ -450,7 +454,7 @@ public class Parser {
         }
         return n;
     }
-
+    //Checks for calling a function
     private Proccall parseProccallState(Name ident) throws ParseException {
         Proccall n = parseProccall(ident);
         Token s = lex.next();
@@ -464,7 +468,7 @@ public class Parser {
         Name ident = parseName();
         return parseProccall(ident);
     }
-
+    
     private Proccall parseProccall(Name ident) throws ParseException {
         Proccall n = new Proccall();
         n.setIdent(ident);
@@ -482,12 +486,12 @@ public class Parser {
         }
         return n;
     }
-
+    //Looks over value assignment
     private AssignState parseAssignment() throws ParseException {
         VarRef varRef = parseVarRef();
         return parseAssignment(varRef);
     }
-
+    
     private AssignState parseAssignState(VarRef varRef) throws ParseException {
         AssignState n = parseAssignment(varRef);
         Token s = lex.next();
@@ -496,7 +500,7 @@ public class Parser {
         }
         return n;
     }
-
+    
     private AssignState parseAssignment(VarRef target) throws ParseException {
         AssignState n = new AssignState();
         n.setIdent(target);
