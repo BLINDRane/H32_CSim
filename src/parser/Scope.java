@@ -18,18 +18,20 @@ import ptn.Type;
  */
 public class Scope {
 
+    //Define a scope
     public Scope(int scopeNum) {
         this.scopeNum = scopeNum;
         table = new HashMap<>();
         parent = null;
         subScope = new ArrayList<>();
     }
-    
+    //add a new scope to the table
     public void add(Name name, Type type) {
         STE ste = new STE(name, type);
         table.put(name.toString(), ste);
     }
-
+    
+    
     public boolean contains(String symbol) {
         return table.containsKey(symbol);
     }
@@ -53,7 +55,7 @@ public class Scope {
         }
         return null;
     }
-
+    //Check to see if scope is global or other
     public Type getType(String token) {
         if(contains(token)){
             return table.get(token).type;
@@ -63,7 +65,7 @@ public class Scope {
         }
         return null;
     }
-    
+    //Get the relative offset of the scope in relation to the table
     public int getRelOffset(String token){
         if(contains(token)){
             return table.get(token).relOffset;
@@ -74,6 +76,7 @@ public class Scope {
         return 0;
     }
     
+    //Set the relative offset of the scope
     public void setRelOffset(String token, int value){
         if(contains(token)){
             table.get(token).relOffset = value;
@@ -84,26 +87,31 @@ public class Scope {
         }
     }
     
+    //Add a subscope to a scope
     public void linkSubScope(Scope scope) {
         subScope.add(scope);
     }
-
+    
+    //Parent a scope to another scope
     public void linkSuperScope(Scope scope) {
         this.parent = scope;
     }
-
+    
+    //Get the superscope of a given scope
     public Scope getSuperScope() {
         return parent;
     }
     
+    //Get the number of subscopes for a scope
     public int getSubScopeCount(){
         return this.subScope.size();
     }
-
+    
+    //Get the label of this scope
     public String label() {
         return label(this);
     }
-
+    //Defines the label of the scope as a unique ID
     private String label(Scope scope) {
         if (scope == null) {
             return "";
